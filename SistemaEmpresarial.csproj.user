@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="Cadastros\Clientes\FrmCadastrarCliente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Clientes\FrmListClientes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Fornecedores\FrmCadastrarFornecedores.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Fornecedores\FrmListFornecedores.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Produtos\FrmCadastrarProduto.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Produtos\FrmListProdutos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Usuarios\FrmCadastraUsuarios.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Cadastros\Usuarios\FrmGrupoDeUsuarios.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CompraVenda\FrmListVendas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CompraVenda\FrmNovaVenda.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Contas\FrmContasReceber.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Util\FrmPermissoes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Util\FrmLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Util\FrmPrincipal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
