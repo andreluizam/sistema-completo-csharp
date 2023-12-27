@@ -2,7 +2,10 @@
 using SistemaEmpresarial.Enumeradores;
 using SistemaEmpresarial.Models;
 using SistemaEmpresarial.Models.Views;
+using SistemaEmpresarial.Configuracoes;
 using System.ComponentModel;
+using System.Drawing.Printing;
+using SistemaEmpresarial.Util;
 
 namespace SistemaEmpresarial.CompraVenda
 {
@@ -71,8 +74,9 @@ namespace SistemaEmpresarial.CompraVenda
 
                 if (vendaID > 0)
                     trazVenda();
+                else
+                    maskData.Text = DateTime.Now.ToString();
 
-                maskData.Text = DateTime.Now.ToString();
                 cbbFormasDePagamento.DataSource = lstFormasPagamentos.ToList();
                 cbbFormasDePagamento.DisplayMember = "Descricao";
             };
@@ -103,14 +107,16 @@ namespace SistemaEmpresarial.CompraVenda
         {
             FrmListVendas frmListVendas = new FrmListVendas(usuarioLogadoID);
             frmListVendas.importando = true;
-            frmListVendas.Show();
+            frmListVendas.ShowDialog();
 
             if (frmListVendas._VendaSelecionada != null)
             {
-                vendaID = frmListVendas._VendaSelecionada.ID;
+
+                lstProdutosVendas.FirstOrDefault(o => o.VendaID == frmListVendas._VendaSelecionada.ID);
+                gridProdutos.DataSource = lstProdutosVendas.ToList();
+
                 txtCliente.Text = frmListVendas._VendaSelecionada.Cliente;
                 txtTotal.Text = frmListVendas._VendaSelecionada.Total.ToString();
-                cbbFormasDePagamento.Text = frmListVendas._VendaSelecionada.FormaPagamento;
                 maskData.Text = frmListVendas._VendaSelecionada.DataEmissao.ToString();
             }
         }
@@ -257,7 +263,7 @@ namespace SistemaEmpresarial.CompraVenda
                 if (formaPagamento.StatusID == 1)
                     pago = true;
                 else
-                    pago = false; // entao foi finalizado em aberto
+                    pago = false;
 
                 Vendas venda = new Vendas();
 
@@ -328,6 +334,8 @@ namespace SistemaEmpresarial.CompraVenda
                     #endregion
 
                     MessageBox.Show("Venda efetuda com sucesso", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    imprimirCupom(venda.ID,txtCliente.Text);
                     LimparCampos();
                 }
             }
@@ -341,6 +349,10 @@ namespace SistemaEmpresarial.CompraVenda
 
 
         #region Text Events
+        private void txtQuantidade_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar)) { e.Handled = true; }
+        }
         private void txtCodiBarra_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -404,13 +416,8 @@ namespace SistemaEmpresarial.CompraVenda
                 txtTotal.Text = Math.Abs(totalComDesconto).ToString("0.00");
                 txtDescontoEmPercentual.Text = descontoPercentual.ToString("0");
             }
-            catch (FormatException)
-            {
-                MessageBox.Show("Os valores inseridos não são válidos.", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                txtDescontoEmReais.Text = "0.00";
-                txtDescontoEmPercentual.Text = "0.00";
-                txtTotal.Text = totalGeral.ToString();
-            }
+            catch (Exception)
+            { }
         }
         private void txtDescontoEmPercentual_Leave(object sender, EventArgs e)
         {
@@ -429,14 +436,8 @@ namespace SistemaEmpresarial.CompraVenda
                 txtTotal.Text = totalComDesconto.ToString("0.00");
                 txtDescontoEmReais.Text = descontoReais.ToString("0.00");
             }
-            catch (FormatException)
-            {
-                MessageBox.Show("Os valores inseridos não são válidos.", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                txtDescontoEmPercentual.Text = "0.00";
-                txtDescontoEmReais.Text = "0.00";
-                txtTotal.Text = totalGeral.ToString();
-            }
+            catch (Exception)
+            { }
         }
         #endregion
 
@@ -503,6 +504,8 @@ namespace SistemaEmpresarial.CompraVenda
             txtEstoque.Text = "0.00";
             txtCodiBarra.Text = string.Empty;
             txtTotal.Text = "0.00";
+            lstProdutosVendas.Clear();
+            gridProdutos.DataSource = lstProdutosVendas.ToList();
         }
         private void limparCamposAdicao()
         {
@@ -532,7 +535,78 @@ namespace SistemaEmpresarial.CompraVenda
                 }
             }
         }
+        private void imprimirCupom(int vendaID, string cliente)
+        {
+            try
+            {
+                string filePath = Application.StartupPath + "\\pedido.txt";
+                string caminhoImpressao = @"\\DESKTOP-55O0AF4\ELGIN";
+
+                using (StreamWriter imprimir = new StreamWriter(filePath))
+                {
+                    imprimir.WriteLine("==================================");
+                    imprimir.WriteLine("           NOME DA EMPRESA        ");
+                    imprimir.WriteLine("             99999999999          ");
+                    imprimir.WriteLine("       PEDIDO NUMERO " + vendaID + "       ");
+                    imprimir.WriteLine("==================================");
+                    imprimir.WriteLine("         " + cliente.ToUpper() +  "      ");
+                    imprimir.WriteLine("PROD       QTD   UNIT    TOTAL    ");
+                }
+
+                if (File.Exists(filePath))
+                {
+                    PrintDocument pd = new PrintDocument();
+
+                    //pd.PrinterSettings.PrinterName = caminhoImpressao;
+
+                    pd.DefaultPageSettings.Margins = new Margins(50, 50, 50, 50);
+
+                    pd.PrintPage += (sender, e) =>
+                    {
+                        try
+                        {
+                            using (StreamReader reader = new StreamReader(filePath))
+                            {
+                                Font fonte = new Font("Arial", 12);
+                                float yPos = 0;
+                                int count = 0;
+                                float leftMargin = 0;
+                                float topMargin = 0;
+                                string linha = null;
+
+                                while (count < 100 && ((linha = reader.ReadLine()) != null))
+                                {
+                                    yPos = topMargin + (count * fonte.GetHeight(e.Graphics));
+                                    e.Graphics.DrawString(linha, fonte, System.Drawing.Brushes.Black, leftMargin, yPos, new StringFormat());
+                                    count++;
+                                }
+                            }
+
+                            e.HasMorePages = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("erro------");
+                            e.HasMorePages = false;
+                        }
+                    };
+
+                    pd.Print();
+                }
+                else
+                {
+                    Console.WriteLine("O arquivo não existe. Certifique-se de que o caminho do arquivo está correto.");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
         #endregion
+
 
 
     }

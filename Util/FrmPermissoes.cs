@@ -233,6 +233,10 @@ namespace SistemaEmpresarial.Configuracoes
                 case 10:
                     descricao = "Consultar pedidos";
                     break;
+                case 11:
+                    descricao = "Cadastrar caixas";
+                    break;
+
 
             }
 

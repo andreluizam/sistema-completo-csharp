@@ -12,6 +12,7 @@
         public const int CadastroProdutos = 8;
         public const int NovoPedido = 9;
         public const int ListaVendas = 10;
+        public const int CadastroCaixas = 11;
  
     }
 }

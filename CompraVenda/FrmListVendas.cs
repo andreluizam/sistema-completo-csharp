@@ -20,7 +20,8 @@ namespace SistemaEmpresarial.CompraVenda
 
         public bool importando = false;
         private int usuarioLogadoID;
-        private int grupoID;
+        private int grupoID = 0;
+        private int clienteID = 0;
 
         public ViewPedido _VendaSelecionada;
         #endregion
@@ -51,16 +52,14 @@ namespace SistemaEmpresarial.CompraVenda
                     gridVendas.DataSource = FindPedidos.ToList();
                     int totalDeCelulas = gridVendas.Columns["Total"].Index;
 
-                    decimal totalPorPedido = 0;
-                    decimal totalPedidos = 0;
+                    decimal total = 0;
 
                     foreach (DataGridViewRow row in gridVendas.Rows)
                     {
-                        totalPorPedido += Convert.ToDecimal(row.Cells[totalDeCelulas].Value);
-                        totalPedidos = totalPedidos + totalPorPedido;
+                        total += Convert.ToDecimal(row.Cells[totalDeCelulas].Value);
                     }
 
-                    lblTotal.Text = totalPedidos.ToString("N2");
+                    lblTotal.Text = total.ToString("N2");
                 }
                 else
                 {
@@ -84,34 +83,38 @@ namespace SistemaEmpresarial.CompraVenda
 
             if (frmListClientes._EntidadeSelecionadaView != null)
             {
-                // clienteID = frmListClientes._EntidadeSelecionadaView.ID;
                 txtCliente.Text = frmListClientes._EntidadeSelecionadaView.Nome;
             }
         }
         #endregion
+
 
         #region Grid Events
         private void gridVendas_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (importando == true)
             {
-                FrmNovaVenda frmNovaVenda = new FrmNovaVenda(usuarioLogadoID);
                 _VendaSelecionada = FindPedidos[e.RowIndex];
+
+                FrmNovaVenda frmNovaVenda = new FrmNovaVenda(usuarioLogadoID);
                 frmNovaVenda.vendaID = _VendaSelecionada.ID;
+                this.Close();
             }
             else
             {
-                FrmNovaVenda frmNovaVenda = new FrmNovaVenda(usuarioLogadoID);
                 _VendaSelecionada = FindPedidos[e.RowIndex];
+
+                FrmNovaVenda frmNovaVenda = new FrmNovaVenda(usuarioLogadoID);
                 frmNovaVenda.vendaID = _VendaSelecionada.ID;
                 frmNovaVenda.Show();
-                this.Close();
             }
         }
         #endregion
 
 
         #region Text Events
+
+
 
         #endregion
 

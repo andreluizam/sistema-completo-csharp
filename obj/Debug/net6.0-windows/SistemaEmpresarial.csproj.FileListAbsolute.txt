@@ -197,3 +197,6 @@ C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Deb
 C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Debug\net6.0-windows\SistemaEmpresarial.pdb
 C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Debug\net6.0-windows\SistemaEmpresarial.genruntimeconfig.cache
 C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Debug\net6.0-windows\ref\SistemaEmpresarial.dll
+C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Debug\net6.0-windows\SistemaEmpresarial.Contas.FrmCaixas.resources
+C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Debug\net6.0-windows\SistemaEmpresarial.sourcelink.json
+C:\Users\Usuário\Documents\Desenvolvimento\projetoC#\SistemaEmpresarial\obj\Debug\net6.0-windows\SistemaEmpresarial.Util.FrmConfiguracoes.resources

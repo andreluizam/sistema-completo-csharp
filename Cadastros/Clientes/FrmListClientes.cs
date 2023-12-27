@@ -97,142 +97,150 @@ namespace SistemaEmpresarial
 
         private void btnExcluir_Click(object sender, EventArgs e)
         {
-            if (lstPermissoes.FirstOrDefault(o => o.GrupoID == grupoID && o.FormID == MeusForms.ListaClientes).EXCLUIR)
+            try
             {
-                if (MessageBox.Show("Deseja excluir o cliente " + _EntidadeSelecionadaView.Nome + " ?", "Pergunta do sistema", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (lstPermissoes.FirstOrDefault(o => o.GrupoID == grupoID && o.FormID == MeusForms.ListaClientes).EXCLUIR)
                 {
-                    using (Contexto context = new Contexto())
+                    if (MessageBox.Show("Deseja excluir o cliente " + _EntidadeSelecionadaView.Nome + " ?", "Pergunta do sistema", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        Entidade ent = new Entidade();
-                        ent = context.Entidade.FirstOrDefault(o => o.ID == entidadeID);
-
-                        if (ent != null)
+                        using (Contexto context = new Contexto())
                         {
+                            Entidade ent = new Entidade();
+                            ent = context.Entidade.FirstOrDefault(o => o.ID == entidadeID);
 
-                            context.Remove(ent);
-                            context.SaveChanges();
-                            MessageBox.Show("Cliente excluido com sucesso", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            carregaClientes();
+                            if (ent != null)
+                            {
+
+                                context.Remove(ent);
+                                context.SaveChanges();
+                                MessageBox.Show("Cliente excluido com sucesso", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                carregaClientes();
+                            }
                         }
                     }
                 }
+                else
+                {
+                    MessageBox.Show("Você não tem permissão para excluir", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else
+            catch (Exception)
             {
-                MessageBox.Show("Você não tem permissão para excluir", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Clientes vinculados a movimentações não é possível excluir", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
 
         #endregion
 
 
-        #region Grid Events
+            #region Grid Events
 
         private void gridCliente_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            try
             {
-                if (importando == true)
+                try
                 {
-                    _EntidadeSelecionadaView = FindEntidades[e.RowIndex];
-                    this.Close();
-                }
-                else
-                {
+                    if (importando == true)
+                    {
+                        _EntidadeSelecionadaView = FindEntidades[e.RowIndex];
+                        this.Close();
+                    }
+                    else
+                    {
 
+                        FrmCadastrarCliente cadastroClientes = new FrmCadastrarCliente(usuarioLogadoID);
+
+                        _EntidadeSelecionadaView = FindEntidades[e.RowIndex];
+                        entidadeID = _EntidadeSelecionadaView.ID;
+
+                        cadastroClientes._EntidadeID = entidadeID;
+                        cadastroClientes.Show();
+                    }
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Selecione um cliente válido", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            private void gridCliente_CellClick(object sender, DataGridViewCellEventArgs e)
+            {
+                try
+                {
                     FrmCadastrarCliente cadastroClientes = new FrmCadastrarCliente(usuarioLogadoID);
 
                     _EntidadeSelecionadaView = FindEntidades[e.RowIndex];
                     entidadeID = _EntidadeSelecionadaView.ID;
 
                     cadastroClientes._EntidadeID = entidadeID;
-                    cadastroClientes.Show();
                 }
+                catch (Exception)
+                { }
             }
-            catch (Exception)
+
+            #endregion
+
+
+            #region Text Events
+            private void txtBusca_TextChanged(object sender, EventArgs e)
             {
-                MessageBox.Show("Selecione um cliente válido", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (!timerBusca.Enabled)
+                    timerBusca.Start();
+                tempo = 300;
             }
-        }
-        private void gridCliente_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            try
+
+            #endregion
+
+
+            #endregion
+
+
+            #region Functions
+
+            private void carregaClientes()
             {
-                FrmCadastrarCliente cadastroClientes = new FrmCadastrarCliente(usuarioLogadoID);
+                BackgroundWorker worker = new BackgroundWorker();
+                Entidade u = new Entidade();
 
-                _EntidadeSelecionadaView = FindEntidades[e.RowIndex];
-                entidadeID = _EntidadeSelecionadaView.ID;
+                worker.DoWork += (s, args) =>
+                {
+                    using (Contexto context = new Contexto())
+                    {
+                        FindEntidades = context.ViewEntidade.Where(o => o.Tipo == 1).ToList();
 
-                cadastroClientes._EntidadeID = entidadeID;
+                        lstEntidades = context.Entidade.ToList();
+                        lstPermissoes = context.Permissoes.ToList();
+                        lstGroupUsers = context.GroupUser.ToList();
+
+                        u = lstEntidades.FirstOrDefault(o => o.ID == usuarioLogadoID);
+
+                        grupoID = Convert.ToInt16(u.GrupoID);
+
+                        lstGroupUsers.FirstOrDefault(grupo => grupo.ID == u.GrupoID);
+
+                    }
+                };
+
+                worker.RunWorkerCompleted += (s, args) =>
+                {
+                    if (lstPermissoes.FirstOrDefault(o => o.GrupoID == u.GrupoID && o.FormID == 2).VISUALIZAR)
+                    {
+                        gridCliente.DataSource = FindEntidades.ToList();
+                        lblQuantidade.Text = FindEntidades.Count + " CLIENTES ENCONTRADOS";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Você não tem permissão para visualizar", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
+                    }
+                };
+
+                if (!worker.IsBusy)
+                    worker.RunWorkerAsync();
+
             }
-            catch (Exception)
-            { }
-        }
 
-        #endregion
+            #endregion
 
-
-        #region Text Events
-        private void txtBusca_TextChanged(object sender, EventArgs e)
-        {
-            if (!timerBusca.Enabled)
-                timerBusca.Start();
-            tempo = 300;
-        }
-
-        #endregion
-
-
-        #endregion
-
-
-        #region Functions
-
-        private void carregaClientes()
-        {
-            BackgroundWorker worker = new BackgroundWorker();
-            Entidade u = new Entidade();
-
-            worker.DoWork += (s, args) =>
-            {
-                using (Contexto context = new Contexto())
-                {
-                    FindEntidades = context.ViewEntidade.Where(o => o.Tipo == 1).ToList();
-
-                    lstEntidades = context.Entidade.ToList();
-                    lstPermissoes = context.Permissoes.ToList();
-                    lstGroupUsers = context.GroupUser.ToList();
-
-                    u = lstEntidades.FirstOrDefault(o => o.ID == usuarioLogadoID);
-
-                    grupoID = Convert.ToInt16(u.GrupoID);
-
-                    lstGroupUsers.FirstOrDefault(grupo => grupo.ID == u.GrupoID);
-
-                }
-            };
-
-            worker.RunWorkerCompleted += (s, args) =>
-            {
-                if (lstPermissoes.FirstOrDefault(o => o.GrupoID == u.GrupoID && o.FormID == 2).VISUALIZAR)
-                {
-                    gridCliente.DataSource = FindEntidades.ToList();
-                    lblQuantidade.Text = FindEntidades.Count + " CLIENTES ENCONTRADOS";
-                }
-                else
-                {
-                    MessageBox.Show("Você não tem permissão para visualizar", "Aviso do sistema", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.Close();
-                }
-            };
-
-            if (!worker.IsBusy)
-                worker.RunWorkerAsync();
 
         }
-
-        #endregion
-
-
     }
-}

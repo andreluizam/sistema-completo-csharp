@@ -129,6 +129,11 @@ CREATE TABLE Vendas (
 	FOREIGN KEY(ClienteID) REFERENCES Entidade(ID),
 	FOREIGN KEY(UsuarioID) REFERENCES Entidade(ID),
 	FOREIGN KEY(FormaPagamentoID) REFERENCES FormasPagamento(ID),
+
+	-- TODO
+	CaixaID int,
+	FOREIGN KEY(CaixaID) REFERENCES Caixas(ID),
+
 );
 GO
 
@@ -152,7 +157,6 @@ CREATE TABLE Caixas (
     ID int PRIMARY KEY IDENTITY NOT NULL,
 	Descricao varchar (20),
 	Saldo decimal(10,2),
-
 );
 GO
 

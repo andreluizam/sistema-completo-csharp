@@ -179,6 +179,7 @@
             txtValor.TabIndex = 3;
             txtValor.Text = "0.00";
             txtValor.KeyDown += txtCodiBarra_KeyDown;
+            txtValor.KeyPress += txtQuantidade_KeyPress;
             txtValor.Leave += txtValor_Leave;
             // 
             // txtQuantidade
@@ -190,6 +191,7 @@
             txtQuantidade.TabIndex = 2;
             txtQuantidade.Text = "0.00";
             txtQuantidade.KeyDown += txtCodiBarra_KeyDown;
+            txtQuantidade.KeyPress += txtQuantidade_KeyPress;
             // 
             // btnPesquisaProduto
             // 
@@ -398,6 +400,7 @@
             txtDescontoEmPercentual.Size = new Size(134, 35);
             txtDescontoEmPercentual.TabIndex = 30;
             txtDescontoEmPercentual.Text = "0.00";
+            txtDescontoEmPercentual.KeyPress += txtQuantidade_KeyPress;
             txtDescontoEmPercentual.Leave += txtDescontoEmPercentual_Leave;
             // 
             // txtDescontoEmReais
@@ -408,6 +411,7 @@
             txtDescontoEmReais.Size = new Size(134, 35);
             txtDescontoEmReais.TabIndex = 29;
             txtDescontoEmReais.Text = "0.00";
+            txtDescontoEmReais.KeyPress += txtQuantidade_KeyPress;
             txtDescontoEmReais.Leave += txtDescontoEmReais_Leave;
             // 
             // label9

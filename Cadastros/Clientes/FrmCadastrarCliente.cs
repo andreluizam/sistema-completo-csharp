@@ -176,7 +176,7 @@ namespace SistemaEmpresarial.Cadastros.Clientes
         {
             if (_EntidadeID > 0)
             {
-                Entidade ent = new Entidade();
+                Entidade ent = new();
 
                 using (Contexto context = new Contexto())
                 {

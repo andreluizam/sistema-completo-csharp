@@ -82,5 +82,17 @@ namespace SistemaEmpresarial
             frmContasReceber.Show();
         }
 
+        private void caixasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmCaixas frmCaixas = new FrmCaixas(usuarioID);
+            frmCaixas.Show();
+        }
+
+        private void sairToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (DialogResult.Yes == MessageBox.Show("Deseja sair do sistema ? ", "Pergunta do sistema", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                this.Close();
+        }
     }
 }
+
